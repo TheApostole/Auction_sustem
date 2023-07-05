@@ -85,13 +85,13 @@ public class LotServiceImpl implements LotService {
         }
         return Files.readAllBytes(Paths.get(String.valueOf(stringWriter)));
     }
-    public void regulatesTheStatus (Integer id, Status status) {
+    private void regulatesTheStatus (Integer id, Status status) {
         Lot lot = lotRepository.findById(id).orElseThrow(LotNotFoundException::new);
         lot.setStatus(status);
         lotRepository.save(lot);
     }
 
-    public Lot toModel(CreateLot createLot) {
+    private Lot toModel(CreateLot createLot) {
         Lot lot = new Lot();
         lot.setStatus(Status.CREATED);
         lot.setTitle(createLot.getTitle());
@@ -101,7 +101,7 @@ public class LotServiceImpl implements LotService {
         return lot;
     }
 
-    public static LotDTO toLotDTO(Lot lot) {
+    private static LotDTO toLotDTO(Lot lot) {
         LotDTO lotDTO = new LotDTO();
         lotDTO.setStatus(lot.getStatus());
         lotDTO.setTitle(lot.getTitle());
