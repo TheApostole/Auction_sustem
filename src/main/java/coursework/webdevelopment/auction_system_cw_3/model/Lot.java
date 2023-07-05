@@ -16,7 +16,7 @@ public class Lot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private int id;
 
     @Column(name = "title")
     private String title;
@@ -25,10 +25,10 @@ public class Lot {
     private String description;
 
     @Column(name = "start_price")
-    private Integer startPrice;
+    private int startPrice;
 
-    @Column(name = "bind_price")
-    private Integer bindPrice;
+    @Column(name = "bid_price")
+    private int bidPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

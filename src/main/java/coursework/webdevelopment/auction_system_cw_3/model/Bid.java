@@ -16,7 +16,7 @@ public class Bid {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    @Column(name = "id")
-   private Integer id;
+   private int id;
 
    @Column(name = "bidder_name")
    private String bidderName;
@@ -26,7 +26,7 @@ public class Bid {
 
    @ManyToOne
    @JoinColumn(name = "lot_id")
-   private Lot lot;
+   private Lot lotId;
 
    public Bid(String bidderName) {
 

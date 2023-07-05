@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface BidRepository extends JpaRepository<Bid, Integer> {
 
-    Optional<BidDTO> findFirstByLot_IdOrderByBidDateAsc(Integer id);
+    Optional<BidDTO> findFirstByLotIdOrderByBidDateAsc(Integer id);
 
     @Query(value = """
             SELECT new coursework.webdevelopment.auction_system_cw_3.dto.BidDTO(b.bidderName, b.bidDate)

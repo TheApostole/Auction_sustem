@@ -24,7 +24,7 @@ public class BidServiceImpl implements BidService {
     @Override
     public BidDTO getInformationAboutTheFirstBidder(Integer id) {
         LOGGER.info("Вызван метод получения информации о первом ставившем на лот - {}", id);
-        return bidRepository.findFirstByLot_IdOrderByBidDateAsc(id).orElseThrow(LotNotFoundException::new);
+        return bidRepository.findFirstByLotIdOrderByBidDateAsc(id).orElseThrow(LotNotFoundException::new);
     }
 
     @Override

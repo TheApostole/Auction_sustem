@@ -23,11 +23,12 @@ public interface LotRepository extends JpaRepository<Lot, Integer> {
                e.bidder_name as bidderName,
                e.bid_date as bidDate
         FROM lots l,(SELECT b.bidderName, b.bidDate FROM bids b
-                                                    WHERE b.lot_id = :lotId
+                                                    WHERE b.lot_id = :lot_id
                                                     ORDER BY b.bidDate DESC LIMIT 1) e
-        WHERE l.id = :lotId
+        WHERE l.id = :b.lotId
 """, nativeQuery = true)
-    FullLot getFullInformationOnLot(@Param("lot_id") int lotId);
+
+    FullLot getFullInformationOnLot(@Param("lot_id") Integer lotId);
 
     Page<Lot> findAllByStatus (Status status, Pageable pageable);
 

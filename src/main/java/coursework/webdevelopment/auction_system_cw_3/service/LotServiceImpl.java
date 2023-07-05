@@ -1,4 +1,6 @@
 package coursework.webdevelopment.auction_system_cw_3.service;
+import coursework.webdevelopment.auction_system_cw_3.exceptions.LotNotFoundException;
+import coursework.webdevelopment.auction_system_cw_3.model.Lot;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
@@ -10,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import coursework.webdevelopment.auction_system_cw_3.dto.*;
 import coursework.webdevelopment.auction_system_cw_3.repository.LotRepository;
-import coursework.webdevelopment.auction_system_cw_3.util.UtilitiesMethods;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -26,30 +27,30 @@ public class LotServiceImpl implements LotService {
 
     private final LotRepository lotRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(LotServiceImpl.class);
-    private final UtilitiesMethods utilitiesMethods;
 
     @Override
     public FullLot getFullInformation(Integer id) {
         LOGGER.info("Вызван метод получения информации о первом ставившем на лот - {}", id);
         return lotRepository.getFullInformationOnLot(id);
+
     }
 
     @Override
     public void startBidding(Integer id) {
         LOGGER.info("Вызван метод для начала торгов по лоту - {}", id);
-        utilitiesMethods.regulatesTheStatus(id, Status.STARTED);
+        regulatesTheStatus(id, Status.STARTED);
     }
 
     @Override
     public void stopBidding(Integer id) {
         LOGGER.info("Вызван метод для остановки торгов по лоту - {}", id);
-        utilitiesMethods.regulatesTheStatus(id, Status.STOPPED);
+        regulatesTheStatus(id, Status.STOPPED);
     }
 
     @Override
     public LotDTO createNewLot(CreateLot createLot) {
         LOGGER.info("Вызван метод для создания лота");
-        return utilitiesMethods.toLotDTO(lotRepository.save(utilitiesMethods.toModel(createLot)));
+        return toLotDTO(lotRepository.save(toModel(createLot)));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class LotServiceImpl implements LotService {
         return Optional.ofNullable(status)
                 .map(stat -> lotRepository.findAllByStatus(stat, pageable))
                 .orElseGet(() -> lotRepository.findAll(pageable)).stream()
-                .map(utilitiesMethods::toLotDTO)
+                .map(LotServiceImpl::toLotDTO)
                 .collect(Collectors.toList());
     }
 
@@ -84,5 +85,31 @@ public class LotServiceImpl implements LotService {
         }
         return Files.readAllBytes(Paths.get(String.valueOf(stringWriter)));
     }
+    public void regulatesTheStatus (Integer id, Status status) {
+        Lot lot = lotRepository.findById(id).orElseThrow(LotNotFoundException::new);
+        lot.setStatus(status);
+        lotRepository.save(lot);
+    }
+
+    public Lot toModel(CreateLot createLot) {
+        Lot lot = new Lot();
+        lot.setStatus(Status.CREATED);
+        lot.setTitle(createLot.getTitle());
+        lot.setDescription(createLot.getDescription());
+        lot.setStartPrice(createLot.getStartPrice());
+        lot.setBidPrice(createLot.getBidPrice());
+        return lot;
+    }
+
+    public static LotDTO toLotDTO(Lot lot) {
+        LotDTO lotDTO = new LotDTO();
+        lotDTO.setStatus(lot.getStatus());
+        lotDTO.setTitle(lot.getTitle());
+        lotDTO.setDescription(lot.getDescription());
+        lotDTO.setStartPrice(lot.getStartPrice());
+        lotDTO.setBidPrice(lotDTO.getBidPrice());
+        return lotDTO;
+    }
+
 
 }

@@ -42,7 +42,7 @@ public class LotsController {
     }
 
     @PostMapping("/{id}/bid")
-    public void placeBet(@PathVariable Integer id, @RequestBody @Valid BidDTO bidDTO) {
+    public void placeBet(@PathVariable Integer id, @RequestBody BidDTO bidDTO) {
         bidService.placeBet(id, bidDTO);
     }
 
@@ -52,7 +52,7 @@ public class LotsController {
     }
 
     @PostMapping
-    public LotDTO createNewLot(@RequestBody @Valid CreateLot createLot) {
+    public LotDTO createNewLot(@RequestBody CreateLot createLot) {
         return lotService.createNewLot(createLot);
     }
 
