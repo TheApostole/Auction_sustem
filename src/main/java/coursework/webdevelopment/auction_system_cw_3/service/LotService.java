@@ -1,4 +1,5 @@
 package coursework.webdevelopment.auction_system_cw_3.service;
+import coursework.webdevelopment.auction_system_cw_3.model.Lot;
 import org.springframework.stereotype.Service;
 import coursework.webdevelopment.auction_system_cw_3.dto.CreateLot;
 import coursework.webdevelopment.auction_system_cw_3.dto.FullLot;
@@ -17,7 +18,7 @@ public interface LotService {
 
     LotDTO createNewLot(CreateLot createLot);
 
-    List<LotDTO> getAllLotsByStatusFilterAndPageNumber(Status status, Integer page);
+    List<Lot> getAllLotsByStatusFilterAndPageNumber(Status status, Integer page);
 
     byte[] exportAllLotsToCSVFile();
 

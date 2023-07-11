@@ -1,5 +1,6 @@
 package coursework.webdevelopment.auction_system_cw_3.service;
 import coursework.webdevelopment.auction_system_cw_3.exceptions.LotStartsException;
+import jakarta.persistence.Tuple;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,8 @@ import coursework.webdevelopment.auction_system_cw_3.model.Bid;
 import coursework.webdevelopment.auction_system_cw_3.model.Lot;
 import coursework.webdevelopment.auction_system_cw_3.repository.BidRepository;
 import coursework.webdevelopment.auction_system_cw_3.repository.LotRepository;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 
 @AllArgsConstructor
 @Service
@@ -24,13 +27,21 @@ public class BidServiceImpl implements BidService {
     @Override
     public BidDTO getInformationAboutTheFirstBidder(Integer id) {
         LOGGER.info("Вызван метод получения информации о первом ставившем на лот - {}", id);
-        return bidRepository.findFirstByLotIdOrderByBidDateAsc(id).orElseThrow(LotNotFoundException::new);
+        Tuple tuple = bidRepository.findsTheFirstBidderOnTheLot(id).orElseThrow(LotNotFoundException::new);
+        return new BidDTO(
+                tuple.get("bidderName", String.class),
+                tuple.get("bidDate", Instant.class).atOffset(ZonedDateTime.now().getOffset())
+        );
     }
 
     @Override
     public BidDTO returnsTheNameOfThePersonWhoBetOnThisLotTheMostNumberOfTimes(Integer id) {
         LOGGER.info("Вызван метод для получения имени ставившего на лот - {} наибольшее количество раз", id);
-        return bidRepository.findTheMostFrequentBidder(id).orElseThrow(LotNotFoundException::new);
+        Tuple tuple = bidRepository.findTheMostFrequentBidder(id).orElseThrow(LotNotFoundException::new);
+        return new BidDTO(
+                tuple.get("bidderName", String.class),
+                tuple.get("bidDate", Instant.class).atOffset(ZonedDateTime.now().getOffset())
+        );
     }
 
     @Override
@@ -40,7 +51,18 @@ public class BidServiceImpl implements BidService {
         if (lot.getStatus() == Status.CREATED || lot.getStatus() == Status.STOPPED) {
             throw new LotStartsException();
         }
-        bidRepository.save(new Bid(bidDTO.getBidderName()));
+        Bid bid = new Bid();
+        bid.setBidderName(bidDTO.getBidderName());
+        bid.setLotId(lot);
+        bid.setBidDate(bidDTO.getBidDate());
+        bidRepository.save(bid);
+    }
+
+    private static BidDTO toDto(Bid bid) {
+        BidDTO bidDTO = new BidDTO();
+        bidDTO.setBidderName(bid.getBidderName());
+        bidDTO.setBidDate(bid.getBidDate());
+        return bidDTO;
     }
 
 }

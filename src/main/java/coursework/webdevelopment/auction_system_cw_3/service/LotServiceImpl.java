@@ -1,6 +1,7 @@
 package coursework.webdevelopment.auction_system_cw_3.service;
 import coursework.webdevelopment.auction_system_cw_3.exceptions.LotNotFoundException;
 import coursework.webdevelopment.auction_system_cw_3.model.Lot;
+import jakarta.persistence.Tuple;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
@@ -14,8 +15,9 @@ import coursework.webdevelopment.auction_system_cw_3.dto.*;
 import coursework.webdevelopment.auction_system_cw_3.repository.LotRepository;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,13 +28,25 @@ import java.util.stream.Collectors;
 public class LotServiceImpl implements LotService {
 
     private final LotRepository lotRepository;
+    private final BidServiceImpl bidService;
     private static final Logger LOGGER = LoggerFactory.getLogger(LotServiceImpl.class);
 
     @Override
     public FullLot getFullInformation(Integer id) {
         LOGGER.info("Вызван метод получения информации о первом ставившем на лот - {}", id);
-        return lotRepository.getFullInformationOnLot(id);
-
+        Tuple tuple = lotRepository.getFullLot(id).orElseThrow(LotNotFoundException::new);
+        return new FullLot(
+                tuple.get("id", Integer.class),
+                Status.valueOf(tuple.get("status", String.class)),
+                tuple.get("title", String.class),
+                tuple.get("description", String.class),
+                tuple.get("startPrice", Integer.class),
+                tuple.get("bidPrice", Integer.class),
+                tuple.get("currentPrice", Long.class).intValue(),
+                new BidDTO(
+                        tuple.get("bidderName", String.class),
+                        tuple.get("bidDate", Instant.class).atOffset(ZonedDateTime.now().getOffset()))
+        );
     }
 
     @Override
@@ -54,13 +68,12 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
-    public List<LotDTO> getAllLotsByStatusFilterAndPageNumber(Status status, Integer indexPage) {
+    public List<Lot> getAllLotsByStatusFilterAndPageNumber(Status status, Integer indexPage) {
         LOGGER.info("Вызван метод для получения всех лотов, основываясь на фильтре статуса и номере страницы");
         Pageable pageable = PageRequest.of(indexPage, 10);
         return Optional.ofNullable(status)
                 .map(stat -> lotRepository.findAllByStatus(stat, pageable))
                 .orElseGet(() -> lotRepository.findAll(pageable)).stream()
-                .map(LotServiceImpl::toLotDTO)
                 .collect(Collectors.toList());
     }
 
@@ -68,22 +81,25 @@ public class LotServiceImpl implements LotService {
     @Override
     public byte[] exportAllLotsToCSVFile() {
         LOGGER.info("Вызван метод для экспортирования всех лотов в файл CSV");
-        List<FullLot> lotList = lotRepository.getFullInformation().stream().toList();
         StringWriter stringWriter = new StringWriter();
         CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
-                .setHeader("id", "title", "status", "lastBidder", "currentPrice")
+                .setHeader("id", "status", "title", "lastBidder", "currentPrice")
                 .build();
         try (CSVPrinter printer = new CSVPrinter(stringWriter, csvFormat)) {
-            lotList.forEach(lot -> {
+            lotRepository.getInformationAboutTheLot().forEach(csvLot -> {
                 try {
-                    printer.printRecord(lot.getId(),lot.getStatus(),
-                            lot.getTitle(),lot.getLastBid(),lot.getCurrentPrice());
+                    printer.printRecord(
+                            csvLot.get("id", Integer.class),
+                            Status.valueOf(csvLot.get("status", String.class)),
+                            csvLot.get("title", String.class),
+                            csvLot.get("lastBidder", String.class),
+                            csvLot.get("currentPrice", Long.class).intValue());
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             });
         }
-        return Files.readAllBytes(Paths.get(String.valueOf(stringWriter)));
+        return stringWriter.toString().getBytes(StandardCharsets.UTF_8);
     }
     private void regulatesTheStatus (Integer id, Status status) {
         Lot lot = lotRepository.findById(id).orElseThrow(LotNotFoundException::new);
@@ -107,9 +123,8 @@ public class LotServiceImpl implements LotService {
         lotDTO.setTitle(lot.getTitle());
         lotDTO.setDescription(lot.getDescription());
         lotDTO.setStartPrice(lot.getStartPrice());
-        lotDTO.setBidPrice(lotDTO.getBidPrice());
+        lotDTO.setBidPrice(lot.getBidPrice());
         return lotDTO;
     }
-
 
 }

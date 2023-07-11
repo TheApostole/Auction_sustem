@@ -11,5 +11,10 @@ import java.time.OffsetDateTime;
 public class BidDTO {
 
     private String bidderName;
+
     private OffsetDateTime bidDate;
+
+    public BidDTO() {
+    }
+
 }

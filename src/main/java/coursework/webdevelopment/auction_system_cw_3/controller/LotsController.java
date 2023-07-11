@@ -1,4 +1,5 @@
 package coursework.webdevelopment.auction_system_cw_3.controller;
+import coursework.webdevelopment.auction_system_cw_3.model.Lot;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,7 +43,7 @@ public class LotsController {
     }
 
     @PostMapping("/{id}/bid")
-    public void placeBet(@PathVariable Integer id, @RequestBody BidDTO bidDTO) {
+    public void placeBet(@PathVariable Integer id, @RequestBody @Valid BidDTO bidDTO) {
         bidService.placeBet(id, bidDTO);
     }
 
@@ -52,12 +53,12 @@ public class LotsController {
     }
 
     @PostMapping
-    public LotDTO createNewLot(@RequestBody CreateLot createLot) {
+    public LotDTO createNewLot(@RequestBody @Valid CreateLot createLot) {
         return lotService.createNewLot(createLot);
     }
 
     @GetMapping
-    public List<LotDTO> getAllLotsByStatusFilterAndPageNumber(@RequestParam(value = "status", required = false)Status status,
+    public List<Lot> getAllLotsByStatusFilterAndPageNumber(@RequestParam(value = "status", required = false)Status status,
                                                            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
         return lotService.getAllLotsByStatusFilterAndPageNumber(status, page);
     }

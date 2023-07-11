@@ -1,12 +1,9 @@
 package coursework.webdevelopment.auction_system_cw_3.dto;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import coursework.webdevelopment.auction_system_cw_3.model.Bid;
 
 @Getter
 @Setter
-@AllArgsConstructor
 
 public class FullLot {
 
@@ -17,9 +14,20 @@ public class FullLot {
     private Integer startPrice;
     private Integer bidPrice;
     private Integer currentPrice;
-    private Bid lastBid;
+    private BidDTO lastBid;
 
     public FullLot() {
+    }
+
+    public FullLot(Integer id, Status status, String title, String description, Integer startPrice, Integer bidPrice, Integer currentPrice, BidDTO lastBid) {
+        this.id = id;
+        this.status = status;
+        this.title = title;
+        this.description = description;
+        this.startPrice = startPrice;
+        this.bidPrice = bidPrice;
+        this.currentPrice = currentPrice;
+        this.lastBid = lastBid;
     }
 
 }
