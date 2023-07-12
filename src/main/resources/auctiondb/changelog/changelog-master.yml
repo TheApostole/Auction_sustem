@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: tables/create-lots-table.yml
+      relativeToChangelogFile: true
+  - include:
+      file: tables/create-bids-table.yml
+      relativeToChangelogFile: true
