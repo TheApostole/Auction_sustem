@@ -27,7 +27,7 @@ public interface LotRepository extends JpaRepository<Lot, Integer> {
                e.bid_date AS bidDate
                FROM lots l
                LEFT JOIN (SELECT b.bidder_name, b.bid_date, b.lot_id
-               FROM bids b
+               FROM bids b WHERE b.lot_id = :lotId
                ORDER BY b.bid_date DESC LIMIT 1) e ON e.lot_id = l.id
                WHERE l.id = :lotId
 """, nativeQuery = true)

@@ -43,8 +43,8 @@ public class LotsController {
     }
 
     @PostMapping("/{id}/bid")
-    public void placeBet(@PathVariable Integer id, @RequestBody @Valid BidDTO bidDTO) {
-        bidService.placeBet(id, bidDTO);
+    public void placeBet(@PathVariable Integer id, @RequestBody @Valid CreateBid createBid) {
+        bidService.placeBet(id, createBid);
     }
 
     @PostMapping("/{id}/stop")

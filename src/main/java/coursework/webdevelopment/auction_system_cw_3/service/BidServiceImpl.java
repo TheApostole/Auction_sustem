@@ -1,4 +1,5 @@
 package coursework.webdevelopment.auction_system_cw_3.service;
+import coursework.webdevelopment.auction_system_cw_3.dto.CreateBid;
 import coursework.webdevelopment.auction_system_cw_3.exceptions.LotStartsException;
 import jakarta.persistence.Tuple;
 import lombok.AllArgsConstructor;
@@ -12,8 +13,8 @@ import coursework.webdevelopment.auction_system_cw_3.model.Bid;
 import coursework.webdevelopment.auction_system_cw_3.model.Lot;
 import coursework.webdevelopment.auction_system_cw_3.repository.BidRepository;
 import coursework.webdevelopment.auction_system_cw_3.repository.LotRepository;
-import java.time.Instant;
-import java.time.ZonedDateTime;
+
+import java.time.*;
 
 @AllArgsConstructor
 @Service
@@ -45,16 +46,16 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public void placeBet(Integer id, BidDTO bidDTO) {
+    public void placeBet(Integer id, CreateBid createBid) {
         LOGGER.info("Вызван метод для ставки по лоту - {}", id);
         Lot lot = lotRepository.findById(id).orElseThrow(LotNotFoundException::new);
         if (lot.getStatus() == Status.CREATED || lot.getStatus() == Status.STOPPED) {
             throw new LotStartsException();
         }
         Bid bid = new Bid();
-        bid.setBidderName(bidDTO.getBidderName());
+        bid.setBidderName(createBid.getBidderName());
+        bid.setBidDate(LocalDateTime.now().atOffset(ZonedDateTime.now().getOffset()));
         bid.setLotId(lot);
-        bid.setBidDate(bidDTO.getBidDate());
         bidRepository.save(bid);
     }
 

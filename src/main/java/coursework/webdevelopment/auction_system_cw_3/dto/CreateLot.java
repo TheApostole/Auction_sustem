@@ -1,7 +1,5 @@
 package coursework.webdevelopment.auction_system_cw_3.dto;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,11 +17,13 @@ public class CreateLot {
     private String description;
 
     @NotNull
-    @Size(min = 1, max = 100)
+    @Min(1)
+    @Max(100)
     private Integer startPrice;
 
     @NotNull
-    @Size(min = 1, max = 100)
+    @Min(1)
+    @Max(100)
     private Integer bidPrice;
 
 }

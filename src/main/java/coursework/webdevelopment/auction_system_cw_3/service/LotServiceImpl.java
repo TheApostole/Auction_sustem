@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class LotServiceImpl implements LotService {
 
     private final LotRepository lotRepository;
-    private final BidServiceImpl bidService;
     private static final Logger LOGGER = LoggerFactory.getLogger(LotServiceImpl.class);
 
     @Override

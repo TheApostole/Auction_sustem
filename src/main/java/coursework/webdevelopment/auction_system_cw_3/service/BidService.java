@@ -1,5 +1,6 @@
 package coursework.webdevelopment.auction_system_cw_3.service;
 import coursework.webdevelopment.auction_system_cw_3.dto.BidDTO;
+import coursework.webdevelopment.auction_system_cw_3.dto.CreateBid;
 
 public interface BidService {
 
@@ -7,6 +8,6 @@ public interface BidService {
 
     BidDTO returnsTheNameOfThePersonWhoBetOnThisLotTheMostNumberOfTimes(Integer id);
 
-    void placeBet(Integer id, BidDTO bidDTO);
+    void placeBet(Integer id, CreateBid createBid);
 
 }

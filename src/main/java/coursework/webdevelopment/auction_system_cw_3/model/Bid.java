@@ -3,7 +3,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -23,7 +22,7 @@ public class Bid {
    private String bidderName;
 
    @Column(name = "bid_date")
-   private OffsetDateTime bidDate;;
+   private OffsetDateTime bidDate;
 
    @ManyToOne
    @JoinColumn(name = "lot_id")
